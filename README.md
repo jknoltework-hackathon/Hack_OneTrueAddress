@@ -1,76 +1,146 @@
-# Hack_OneTrueAddress
-Hack-Ai-Thon OneTrueAddress agent repository
+# OneTrueAddress - Address Search Application
 
-## Overview
-An AI agent that uses Claude LLM to compare free-form plain English addresses against a golden source table of known good addresses.
+A web application for searching Pinellas County, FL addresses with fuzzy matching and exact search capabilities.
 
-## Setup
+## Features
 
-### 1. Install Dependencies
+- 🔍 **Smart Search**: Find addresses with fuzzy matching for similar results
+- 🎯 **Exact Match**: Search for precise address matches
+- 🎨 **Modern UI**: Beautiful, responsive interface
+- ⚡ **Fast Results**: Quick PostgreSQL queries with optimized searching
+- 📱 **Mobile Friendly**: Works seamlessly on all devices
+
+## Quick Start
+
+### Prerequisites
+
+- Python 3.8 or higher
+- PostgreSQL database access
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd Hack_OneTrueAddress
+```
+
+2. Create a virtual environment:
+```bash
+python -m venv venv
+
+# On Windows
+venv\Scripts\activate
+
+# On macOS/Linux
+source venv/bin/activate
+```
+
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Configure Environment Variables
-Create a `.env` file in the root directory with the following variables:
+4. Configure environment variables:
+```bash
+# Copy the example file
+cp .env.example .env
 
-```env
-# Claude API Configuration
-CLAUDE_API_KEY=your_claude_api_key_here
-
-# Golden Source Database Configuration
-# Database type: postgresql, mysql, or sqlite
-GOLDEN_SOURCE_DB_TYPE=postgresql
-GOLDEN_SOURCE_HOST=localhost
-GOLDEN_SOURCE_PORT=5432
-GOLDEN_SOURCE_DATABASE=your_database_name
-GOLDEN_SOURCE_USER=your_username
-GOLDEN_SOURCE_PASSWORD=your_password
-GOLDEN_SOURCE_TABLE=addresses
-
-# Confidence Threshold Configuration (optional, default: 90.0)
-# Matches with confidence below this threshold will trigger business rule exceptions
-CONFIDENCE_THRESHOLD=90.0
+# Edit .env and add your database password
 ```
 
-### 3. Install Database Driver (if needed)
-- For PostgreSQL: `pip install psycopg2-binary`
-- For MySQL: `pip install mysql-connector-python`
-- SQLite: Included with Python
+5. Run the application:
+```bash
+python app.py
+```
+
+6. Open your browser and navigate to:
+```
+http://localhost:5000
+```
 
 ## Usage
 
-Run the agent with an address to match:
+### Search Methods
 
-```bash
-python main.py "123 Main Street, New York, NY 10001"
+**Similar Match (Default)**
+- Finds addresses that contain your search terms
+- Case-insensitive
+- Returns up to 50 results
+- Best for partial addresses or when unsure of exact format
+
+**Exact Match**
+- Finds addresses that exactly match your search
+- Case-insensitive
+- Returns up to 10 results
+- Best when you know the complete address
+
+### API Endpoints
+
+**POST /search**
+- Fuzzy/similar address search
+- Body: `{"query": "your address"}`
+- Returns: List of matching addresses with Full Address, Mailing City, and Zipcode
+
+**POST /search/exact**
+- Exact address match search
+- Body: `{"query": "your address"}`
+- Returns: List of exactly matching addresses
+
+**GET /health**
+- Health check endpoint
+- Returns application and database status
+
+## Database Schema
+
+**Table**: `team_cool_and_gang.pinellas_fl`
+
+**Columns**:
+- `Full Address`: Complete address string
+- `Mailing City`: City name
+- `Zipcode`: ZIP code
+
+## Development
+
+### Project Structure
+```
+Hack_OneTrueAddress/
+├── app.py                 # Flask application
+├── requirements.txt       # Python dependencies
+├── .env                   # Environment variables (not in git)
+├── .env.example          # Environment template
+├── .gitignore            # Git ignore rules
+├── README.md             # This file
+└── templates/
+    └── index.html        # Web interface
 ```
 
-The agent will:
-1. Extract search criteria from the input address using Claude (with confidence score)
-2. Filter the golden source database using extracted criteria
-3. Query Claude to find the exact match from filtered candidates (with confidence score)
-4. Display the match result with confidence and reasoning
-5. Flag business rule exceptions for matches below the confidence threshold
+### Environment Variables
 
-## Confidence and Business Rules
+- `DB_HOST`: Database host (default: 212.2.245.85)
+- `DB_PORT`: Database port (default: 6432)
+- `DB_NAME`: Database name (default: postgres)
+- `DB_USER`: Database username (default: postgres)
+- `DB_PASSWORD`: Database password (required)
+- `FLASK_ENV`: Flask environment (development/production)
+- `FLASK_DEBUG`: Enable debug mode (True/False)
 
-The agent uses confidence scores (0-100) for both:
-- **Extraction confidence**: How confident Claude is in extracting address components
-- **Match confidence**: How confident Claude is in the final address match
+## Deployment
 
-**Business Rule Exception**: If the match confidence is below the configured threshold (default 90%), the system will:
-- Log a warning message
-- Flag the result with `business_rule_exception: true`
-- Indicate that manual review may be required
+For production deployment:
 
-You can configure the confidence threshold in your `.env` file using `CONFIDENCE_THRESHOLD` (default: 90.0).
+1. Set `FLASK_ENV=production` in `.env`
+2. Set `FLASK_DEBUG=False`
+3. Use a production WSGI server like Gunicorn:
 
-## Project Structure
+```bash
+gunicorn -w 4 -b 0.0.0.0:5000 app:app
+```
 
-- `main.py` - Entry point and CLI interface
-- `address_agent.py` - Main agent orchestrating the matching process
-- `claude_client.py` - Claude API interaction module
-- `golden_source.py` - Database connection and query module
-- `config.py` - Configuration management
-- `requirements.txt` - Python dependencies
+## License
+
+MIT License - See LICENSE file for details
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.

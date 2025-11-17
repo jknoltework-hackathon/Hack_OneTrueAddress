@@ -1,0 +1,4 @@
+Initial Prompt: 
+i would you to help me create a new application using python. this application will be an AI agent that will use the Clause LLM (i have an API Key) to compare a free form (Plain English) address value against a table of known good addresses. We'll call that file the 'golden source' table. the agent should prompt claude with the input address and ask Claude to locate the exact match from the table. I have API Keys and connection details for the golden source table if you need them. can we start here and iterate once you have this first version complete
+
+Next Prompt:
